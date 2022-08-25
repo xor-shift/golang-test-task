@@ -14,11 +14,11 @@ type RedisState struct {
 	RedisClient *redis.Client
 }
 
-func NewRedisState() *RedisState {
+func NewRedisState(host string, port uint16, password string, db int) *RedisState {
 	redisClient := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       0,
+		Addr:     fmt.Sprintf("%s:%d", host, port),
+		Password: password,
+		DB:       db,
 	})
 
 	return &RedisState{

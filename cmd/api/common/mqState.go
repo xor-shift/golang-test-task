@@ -11,8 +11,9 @@ type MQState struct {
 	messageQueue amqp.Queue
 }
 
-func NewMQState() (*MQState, error) {
-	connection, err := amqp.Dial("amqp://user:password@localhost:7001/")
+func NewMQState(host string, port uint16, user, pass string) (*MQState, error) {
+	url := fmt.Sprintf("amqp://%s:%s@%s:%d/", user, pass, host, port)
+	connection, err := amqp.Dial(url)
 	if err != nil {
 		return nil, err
 	}

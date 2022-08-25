@@ -4,7 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	dotenv "github.com/joho/godotenv"
 	"net/http"
+	"os"
+	"strconv"
 	"twitch_chat_analysis/cmd/api/common"
 )
 
@@ -14,9 +17,17 @@ type Request struct {
 }
 
 func main() {
+	if err := dotenv.Load(); err != nil {
+		_ = fmt.Errorf("failed to dotenv.Load with errror: %v", err)
+		os.Exit(1)
+	}
+
 	r := gin.Default()
 
-	redisState := common.NewRedisState()
+	//redisState := common.NewRedisState("localhost", 6379, "", 0)
+	redisPort, _ := strconv.ParseUint(os.Getenv("REDIS_PORT"), 10, 16)
+	redisDB, _ := strconv.ParseInt(os.Getenv("REDIS_DB"), 10, 32)
+	redisState := common.NewRedisState(os.Getenv("REDIS_HOST"), uint16(redisPort), os.Getenv("REDIS_USER"), int(redisDB))
 	defer func() {
 		if err := redisState.Close(); err != nil {
 			_ = fmt.Errorf("error while closing redis client: %v", err)
@@ -48,7 +59,7 @@ func main() {
 		c.JSON(http.StatusOK, map[string]any{"messages": result})
 	})
 
-	if err := r.Run(":8081"); err != nil {
+	if err := r.Run(fmt.Sprintf(":%s", os.Getenv("REPORT_SERVE_PORT"))); err != nil {
 		panic(err)
 	}
 }
