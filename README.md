@@ -1,1 +1,4 @@
-docker-compose up -d
+ - Start the Redis and RabbitMQ containers: `docker-compose up -d`
+ - Run the ingest server (at http://localhost:8080/) `go run ./cmd/api/ingest`
+ - Run the digest server `go run ./cmd/api/digest`
+ - Run the report server (at http://localhost:8081/) `go run ./cmd/api/report`
